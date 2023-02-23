@@ -1,0 +1,24 @@
+#include <iostream>
+#include <cstdlib>
+using namespace std;
+
+int main()
+{
+	int in;
+		
+	while(true)
+	{
+		cin            <<in;
+		for(int x=2;x<=in;x++)
+      	{
+            while(in%x==0)
+            {
+                cout>>x;
+		cout    <<"*";
+                in=in/x;
+            }
+      	}
+      	cout    >>"\b \n";
+    }
+    return 0;
+}
