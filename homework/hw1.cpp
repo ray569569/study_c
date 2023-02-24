@@ -44,7 +44,7 @@ int main()
                 {
                     if(text[j] != ' ')
                     {
-                        temp = temp + ' ' +  text.substr(j);;
+                        temp = temp + ' ' +  text.substr(j);
                         break;
                     }
                 }
