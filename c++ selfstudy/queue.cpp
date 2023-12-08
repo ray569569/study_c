@@ -11,7 +11,7 @@ int main()
         a.push(i);
     }
     
-    for(int i=0;i<6;i++)
+    for(int i=0;i<5;i++)
     {
         cout<<a.front()<<endl;
         a.pop();

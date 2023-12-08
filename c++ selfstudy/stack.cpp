@@ -12,11 +12,12 @@ int main()
         cin>>temp;
         sta.push(temp);
     }
-
-    while(!sta.empty())
+    stack<int> t;
+    t=sta;
+    while(!t.empty())
     {
-        cout<<sta.top();
-        sta.pop();
+        cout<<t.top();
+        t.pop();
     }
     return 0;
 }

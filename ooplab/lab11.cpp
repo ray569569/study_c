@@ -11,6 +11,8 @@ class I {
     string type, name;
     int value;
     bool friend operator<(I a, I b);
+    protected:
+        int f;
 };
 bool operator<(I a, I b) {
     if (a.type < b.type) {
