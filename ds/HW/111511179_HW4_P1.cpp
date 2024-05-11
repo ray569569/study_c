@@ -1,102 +1,119 @@
 #include<iostream>
-#include<map>
-#include<string>
-#include<sstream>
 #include<vector>
+#include<algorithm>
 using namespace std;
 
-class Gate
+void DFS(int start,int now,int end,int size, bool** matrix,vector<vector<int>> &path,vector<int> &temp)
 {
-public:
-    string type;
-    string input1;
-    string input2;
-    string output;
-    Gate(string t,string in1,string in2,string out)
+    //cout<<"dd"<<endl;
+    //cout<<start<<' '<<now<<' '<<end<<' '<<size<<endl;
+    if(temp[temp.size()-1]==end)
     {
-        type = t;
-        input1 = in1;
-        input2 = in2;
-        output = out;
+        path.push_back(temp);
+        temp.clear();
+        //cout<<"pushed"<<endl;
+        return ;
     }
-};
+    else
+    {
+        for(int i=0;i<size;i++)
+        {
+            //cout<<i<<" I am i"<<endl;
+            if(matrix[now][i]==1)
+            {
+                vector<int > state = temp;
+                temp.push_back(i);
+                DFS(start,i,end,size,matrix,path,temp);
+                temp = state;
+            }
+        }
+        return ;
+    }
+}
+
 int main()
 {
-    map<string, bool> list;
-    string input, input1, gate, in1, in2, out;
-    vector<string > ans;
-    vector<Gate > gatelist;
-    int temp1=0;
+    int number,temp1,temp2,start=0;
+    vector<int > target;
+    bool** connect;
 
-    getline(cin,input);
-    getline(cin,input1);
-    stringstream ss, tt;
-    ss << input;
-    tt << input1;
-    while (ss >> in1) {
-        tt >> temp1;
-        list[in1] = temp1;
-    }
-
-    getline(cin,input);
-    stringstream kk;
-    kk<<input;
-    while(kk>>in1)
+    cin>>number;
+    connect = new bool*[number];
+    for(int i=0;i<number;i++)
     {
-        ans.push_back(in1);
+        connect[i] = new bool[number];
     }
-
-    while(getline(cin,input))
+    for(int i=0;i<number;i++)
     {
-        stringstream mm;
-        mm<<input;
-        mm>>gate;
-        mm>>in1;
-        if(gate=="INV")
+        for(int j=0;j<number;j++)
         {
-            mm>>in1;
-            mm>>out;
-            Gate temp(gate,in1,in1,out);
-            gatelist.push_back(temp);
-        }
-        else if(gate=="NAND"||gate=="NOR")
-        {
-            mm>>in1;
-            mm>>in2;
-            mm>>out;
-            Gate temp(gate,in1,in2,out);
-            gatelist.push_back(temp);
+            connect[i][j] = false;
         }
     }
 
-    for(int i=0;i<gatelist.size();i++)
+    while(cin>>temp1)
     {
-        for(int j=0;j<gatelist.size();j++)
+        cin>>temp2;
+        if(temp2==-1)
         {
-            map<string, bool >::iterator iter1 = list.find(gatelist[j].input1);
-            map<string, bool >::iterator iter2 = list.find(gatelist[j].input2); 
-            if(iter1!=list.end()&&iter2!=list.end())
+            target.push_back(temp1);
+        }
+        else
+        {
+            connect[temp1][temp2] = true;
+        }
+    }
+
+    for(int i=0;i<number;i++)
+    {
+        int n=0;
+        for(int j=0;j<number;j++)
+        {
+            if(connect[j][i] == false)
             {
-                if(gatelist[j].type == "INV")
-                {
-                    list[gatelist[j].output]=!list[gatelist[j].input1];
-                }
-                else if(gatelist[j].type=="NAND")
-                {
-                    list[gatelist[j].output] = !(list[gatelist[j].input1]&&list[gatelist[j].input2]);
-                }
-                else if(gatelist[j].type=="NOR") 
-                {
-                    list[gatelist[j].output] = !(list[gatelist[j].input1]||list[gatelist[j].input2]);
-                }
+                //cout<<j<<' '<<i<<endl;
+                n++;
+            }
+        }
+        //cout<<n<<' '<<number<<endl;
+        if(n==number)
+        {
+            start = i;
+            break;
+        }
+    }
+//    cout<<start<<endl;
+
+    vector<vector<int >> path;
+    vector<int > temp;
+    for(int i=0;i<target.size();i++)
+    {
+        temp.push_back(start);
+        DFS(start,start,target[i],number,connect,path,temp);
+        temp.clear();
+    }
+    //cout<<path.size()<<endl;
+    sort(path.begin(),path.end());
+    for(int i=0;i<path.size();i++)
+    {
+        for(int j=0;j<path.size()-1;j++)
+        {
+            if(path[j].size()>path[j+1].size())
+            {
+                vector<int > temp1 = path[j+1];
+                path[j+1] = path[j];
+                path[j] = temp1;
             }
         }
     }
-    int n=0;
-    while(n<ans.size())
+
+    for(int i=0;i<path.size();i++)
     {
-        cout<<ans[n]<<" "<<list[ans[n]]<<endl;
-        n++;
+        for(int j=0;j<path[i].size();j++)
+        {
+            cout<<path[i][j]<<' ';
+        }
+        cout<<endl;
     }
     return 0;
 }

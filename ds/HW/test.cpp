@@ -1,79 +1,119 @@
 #include<iostream>
-#include<map>
-#include<string>
-#include<sstream>
 #include<vector>
+#include<cmath>
 using namespace std;
+
+class vegi
+{
+public:
+    int bunni1;
+    int bunni2;
+    int bundif;
+    vegi(int a,int b)
+    {
+        bunni1 = a;
+        bunni2 = b;
+        bundif = a-b;
+    }
+};
+
+void swap(vegi &p1, vegi &p2){
+    vegi temp = p1;
+    p1 = p2;
+    p2 = temp;
+}
+
+void buildheap(vector<vegi > &list)
+{
+    for(int i=list.size()-1;i>1;i--)
+    {
+        if(list[i/2].bundif<list[i].bundif)
+        {
+            //cout<<list[i/2].bundif<<" "<<list[i].bundif<<endl;
+            swap(list[i/2],list[i]);
+        }
+    }
+}
+
+void heapsort(vector<vegi > &list)
+{
+    for(int i=1;i*2+1<list.size();)
+    {
+        if(list[i].bundif>=list[i*2].bundif&&list[i].bundif>=list[i*2+1].bundif)
+        {
+            break;
+        }
+        else
+        {
+            if(list[i*2].bundif>list[i*2+1].bundif)
+            {
+                swap(list[i*2],list[i]);
+                i = i*2;
+            }
+            else
+            {
+                swap(list[i*2+1],list[i]);
+                i = i*2+1;
+            }
+        }
+    }
+}
 
 int main()
 {
-    map<string, bool> list;
-    string input,input1;
-    string gate, key, key1, key2;
-    vector<string > ans;
-    int temp1=0;
-    getline(cin,input);
-    getline(cin,input1);
-
-    stringstream ss, tt;
-    ss << input;
-    tt << input1;
-
-    while (ss >> key) {
-        tt >> temp1;
-        list[key] = temp1;
-    }
-    getline(cin,input);
-    //cout<<"dd"<<" "<<input<<endl;
-    stringstream kk;
-    kk<<input;
-    while(kk>>key)
+    vector<vegi > list;
+    vector<vegi > sorted;
+    int num,first;
+    int* arr1;
+    int* arr2;
+    cin>>num;
+    arr1 = new int[num];
+    arr2 = new int[num];
+    for(int i=0;i<num;i++)
     {
-        //cout<<"rr";
-        list[key]=0;
-        ans.push_back(key);
+        cin>>arr1[i];
     }
-    while(getline(cin,input))
+    for(int i=0;i<num;i++)
     {
-        stringstream mm;
-        mm<<input;
-        //cout<<input<<endl;  
-        mm>>gate;
-        //cout<<gate<<endl;
-        mm>>key;
-        //cout<<key<<endl;
-        if(gate=="INV")
-        {
-            mm>>key;
-            mm>>key1;
-            list[key1]=!list[key];
-        }
-        else if(gate=="NAND")
-        {
-            mm>>key;
-            mm>>key1;
-            mm>>key2;
-            list[key2] = !(list[key]&&list[key1]);
-        }
-        else if(gate=="NOR")
-        {
-            mm>>key;
-            mm>>key1;
-            mm>>key2;
-            list[key2] = !(list[key]||list[key1]);
-        }
+        cin>>arr2[i];
     }
-    int n=0;
+    cin>>first;
+    vegi temp1(arr1[0],arr2[0]);
+    list.push_back(temp1);
+    for(int i=0;i<num;i++)
+    {
+        vegi temp(arr1[i],arr2[i]);
+        list.push_back(temp);
+    }
+
+    buildheap(list);
     /*
-    for(auto i:list)
+    for(int i=1;i<=num;i++)
     {
-        cout<<i.first<<' '<<i.second<<endl;
-    }*/
-    while(n<ans.size())
-    {
-        //cout<<"ss";
-        cout<<ans[n]<<" "<<list[ans[n]]<<endl;
-        n++;
+        cout<<list[i].bunni1<<' '<<list[i].bunni2<<endl;
     }
+    cout<<"ss"<<endl;
+    */
+    for(int i=1;i<=num;i++)
+    {
+        swap(list[1],list[list.size()-1]);
+        sorted.push_back(list[list.size()-1]);
+        //cout<<sorted[i-1].bundif<<endl;
+        list.pop_back();
+        heapsort(list);
+    }
+    int sum=0;
+    for(int i=0;i<sorted.size();i++)
+    {
+        if(i<first)
+        {
+            sum+=sorted[i].bunni1;
+        }
+        else
+        {
+            sum+=sorted[i].bunni2;
+        }
+    }
+    cout<<sum<<endl;
     return 0;
 }
