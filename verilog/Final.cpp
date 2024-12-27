@@ -87,7 +87,11 @@ void multiplyMatrixVector(const vector<vector<int>>& matrix, const vector<int>& 
 }
 
 int main() {
+<<<<<<< HEAD
      //srand(time(0));  // 设定随机数种子
+=======
+    // srand(time(0));  // 设定随机数种子
+>>>>>>> 0ac91debceb1f9b00ca64fa11916a9390db1a3c4
     ofstream in;
     ofstream out;
     in.open("in.txt");
@@ -100,10 +104,17 @@ int main() {
     int num = 1;
     for (int k = 0; k < num; k++) {
         generateRandomMatrix(matrix);
+<<<<<<< HEAD
         
         //cout << "Original 8x16 Matrix:" << endl;
         printMatrix(matrix, 8, 16);
         cout<<endl;
+=======
+
+        // cout << "Original 8x16 Matrix:" << endl;
+        printMatrix(matrix, 8, 16);
+        cout << endl;
+>>>>>>> 0ac91debceb1f9b00ca64fa11916a9390db1a3c4
         for (int i = 0; i < 8; ++i) {
             for (int j = 0; j < 16; ++j) {
                 in << matrix[i][j] << " ";
@@ -112,20 +123,35 @@ int main() {
         }
         transposeMatrix(matrix, transpose);
 
+<<<<<<< HEAD
         //cout << "\nTransposed 16x8 Matrix:" << endl;
         //printMatrix(transpose, 16, 8);
 
         multiplyMatrices(matrix, transpose, result);
 
          //cout << "\nResultant 8x8 Matrix:" << endl;
+=======
+        // cout << "\nTransposed 16x8 Matrix:" << endl;
+        // printMatrix(transpose, 16, 8);
+
+        multiplyMatrices(matrix, transpose, result);
+
+        // cout << "\nResultant 8x8 Matrix:" << endl;
+>>>>>>> 0ac91debceb1f9b00ca64fa11916a9390db1a3c4
         printMatrix(result, 8, 8);
 
         // 对结果矩阵进行行平均值计算并处理
         processMatrix(result);
 
+<<<<<<< HEAD
          //cout << "\nProcessed 8x8 Matrix:" << endl;
        printMatrix(result, 8, 8);
    // cout<<endl;
+=======
+        // cout << "\nProcessed 8x8 Matrix:" << endl;
+        printMatrix(result, 8, 8);
+        // cout<<endl;
+>>>>>>> 0ac91debceb1f9b00ca64fa11916a9390db1a3c4
         // 生成随机的 8x1 向量
         generateRandomVector(vec);
 
