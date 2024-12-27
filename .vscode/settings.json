@@ -1,0 +1,13 @@
+{
+    "files.associations": {
+        "*.ino": "cpp",
+        "iostream": "cpp",
+        "array": "cpp",
+        "ranges": "cpp",
+        "span": "cpp",
+        "vector": "cpp",
+        "xstring": "cpp",
+        "xutility": "cpp",
+        "ostream": "cpp"
+    }
+}
