@@ -1,47 +1,57 @@
-#include <fstream>
-#include <iostream>
-#include <sstream>
-#include <string>
-#include <vector>
+#include<iostream>
+#include<fstream>
+#include<string>
+#include<sstream>
+#include<vector>
 using namespace std;
 
-int main() {
+int main()
+{
     ifstream in;
-    in.open("./lab1_test/lab1_t5.txt");
+    in.open("Lab7_1.txt");
     string line;
     stringstream ss1;
 
     vector<vector<int>> v;
     vector<int> v1;
-    getline(in, line);
-    while (!in.eof()) {
+    while(!in.eof())
+    {
+        
         getline(in, line);
         ss1 << line;
         int temp;
-        while (ss1 >> temp) {
+        while(ss1 >> temp)
+        {
             v1.push_back(temp);
         }
         ss1.clear();
         v.push_back(v1);
         v1.clear();
     }
-    cout << "Local Maxima: " << endl;
-    for (int i = 0; i < v.size(); i++) {
-        for (int j = 0; j < v[i].size(); j++) {
-            if (0 <= i - 1 && v[i - 1][j] >= v[i][j]) {
+    cout<<"Local Maxima: "<<endl;   
+    for(int i = 0; i < v.size(); i++)
+    {
+        for(int j = 0; j < v[i].size(); j++)
+        {
+            if(0<=i-1 && v[i-1][j] >= v[i][j])
+            {
                 continue;
             }
-            if (0 <= j - 1 && v[i][j - 1] >= v[i][j]) {
+            if(0<=j-1 && v[i][j-1] >= v[i][j])
+            {
                 continue;
             }
-            if (i + 1 < v.size() && v[i + 1][j] >= v[i][j]) {
+            if(i+1<v.size() && v[i+1][j] >= v[i][j])
+            {
                 continue;
             }
-            if (j + 1 < v[i].size() && v[i][j + 1] >= v[i][j]) {
+            if(j+1<v[i].size() && v[i][j+1] >= v[i][j])
+            {
                 continue;
             }
-            cout << "Value: " << v[i][j] << " at (" << i + 1 << ", " << j + 1 << ")" << endl;
+            cout <<"Value: "<< v[i][j] << " at ("<< i+1 << ", " << j+1 <<")"<< endl;
         }
     }
     return 0;
+    
 }
