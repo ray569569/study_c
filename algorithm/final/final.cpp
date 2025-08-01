@@ -1,40 +1,39 @@
+#include <algorithm>
+#include <chrono>
+#include <cmath>
+#include <fstream>
 #include <iostream>
-#include <vector>
 #include <set>
 #include <unordered_map>
-#include <cmath>
-#include <algorithm>
-
+#include <vector>
 using namespace std;
 
-// 节点与边定义
 class Node {
 public:
-    int id;
-    int weight; // 内存需求
-
+    long long id;
+    long long weight; 
+    long long server; 
 };
 
 class Edge {
 public:
-    vector<int> members; // 边连接的节点集合
-    int weight;          // 通信成本（默认为1）
+    vector<long long> members; 
+    long long total_weight; 
+    long long edge_cost;    
 };
 
-// 全局变量
-int maxDiskCapacity;
-vector<Node> nodes;
-vector<Edge> edges;
-vector<int> assignments; // 节点分配的服务器ID
+long long maxDiskCapacity;
+vector<Node> nodes;       // Agent
+vector<Edge> edges;       // TEAM
+vector<int> assignments; 
 
-// 计算通信成本
-int calculateCost() {
-    int totalCost = 0;
+long long calculateCost() {
+    long long totalCost = 0;
     unordered_map<int, set<int>> teamServers;
 
-    for (const auto& edge : edges) {
+    for (const auto &edge : edges) {
         set<int> servers;
-        for (int member : edge.members) {
+        for (long long member : edge.members) {
             servers.insert(assignments[member]);
         }
         totalCost += pow(servers.size() - 1, 2);
@@ -42,50 +41,153 @@ int calculateCost() {
     return totalCost;
 }
 
-// Fiduccia-Mattheyses (FM) 划分算法
-void fiducciaMattheyses(int numServers) {
-    // 初始划分：将节点随机分配到服务器
-    assignments.resize(nodes.size(), 0);
-    vector<int> serverCapacities(numServers, maxDiskCapacity);
-
-    for (int i = 0; i < nodes.size(); ++i) {
-        for (int s = 0; s < numServers; ++s) {
-            if (serverCapacities[s] >= nodes[i].weight) {
-                assignments[i] = s;
-                serverCapacities[s] -= nodes[i].weight;
-                break;
+long long incrementalCost(int node, int newServer) {
+    long long deltaCost = 0;
+    for (const auto &edge : edges) {
+        if (find(edge.members.begin(), edge.members.end(), node) != edge.members.end()) {
+            set<int> servers;
+            for (long long member : edge.members) {
+                if (member == node) {
+                    servers.insert(newServer);
+                } else {
+                    servers.insert(assignments[member]);
+                }
             }
+            deltaCost += pow(servers.size() - 1, 2);
         }
     }
+    return deltaCost;
+}
 
-    // 优化：尝试移动节点减少通信成本
-    bool improved = true;
-    while (improved) {
-        improved = false;
+void optimizedFM(long long numServers, vector<int> &serverCapacities) {
+    auto start_time = chrono::steady_clock::now();
+    const int TIME_LIMIT = 5400; 
+
+    while (1) {
+        auto current_time = chrono::steady_clock::now();
+        auto elapsed_time = chrono::duration_cast<chrono::seconds>(current_time - start_time).count();
+        if (elapsed_time >= TIME_LIMIT) {
+            cout << "Time limit reached, stopping optimization.\n";
+            break;
+        }
+
         for (int i = 0; i < nodes.size(); ++i) {
             int currentServer = assignments[i];
             for (int s = 0; s < numServers; ++s) {
                 if (s == currentServer) continue;
+                if (serverCapacities[s] < nodes[i].weight) continue;
 
-                // 试探性移动节点
-                assignments[i] = s;
-                int newCost = calculateCost();
-                if (newCost < calculateCost()) {
-                    improved = true; // 成本降低，保留移动
-                    break;
-                } else {
-                    assignments[i] = currentServer; // 恢复
+                long long deltaCost = incrementalCost(i, s) - incrementalCost(i, currentServer);
+                if (deltaCost < 0) {  
+                    assignments[i] = s;
+                    serverCapacities[s] -= nodes[i].weight;
+                    serverCapacities[currentServer] += nodes[i].weight;
                 }
             }
         }
     }
 }
 
-int main() {
-    // 初始化输入，构建图
-    // 运行 FM 算法或其他方法
-    fiducciaMattheyses(2); // 示例：2-way 划分
-    cout << "Total Cost: " << calculateCost() << endl;
+void build_graph(long long numServers) {
+
+    assignments.resize(nodes.size(), 0);
+    vector<int> serverCapacities(numServers, maxDiskCapacity);
+
+    for (long long i = 0; i < edges.size(); ++i) {
+
+        for (int j = 0; j < edges[i].members.size(); j++) {
+            if (nodes[edges[i].members[j]].server != -1) {
+                continue;
+            }
+
+            for (long long s = 0; s < serverCapacities.size(); ++s) {
+                // cout<<edges[i].members[j]<<endl;
+                // cout<<"serverCapacities["<<s<<"]: "<<serverCapacities[s]<<endl;
+                // cout<<serverCapacities[s]<<endl;
+                if (s == numServers - 1 && serverCapacities[s] < nodes[edges[i].members[j]].weight) {
+                    numServers++;
+                    serverCapacities.push_back(maxDiskCapacity);
+                }
+                if (serverCapacities[s] >= nodes[edges[i].members[j]].weight) {
+                    // file << s << endl;
+                    assignments[edges[i].members[j]] = s;
+                    serverCapacities[s] -= nodes[edges[i].members[j]].weight;
+                    nodes[edges[i].members[j]].server = s;
+                    break;
+                }
+            }
+        }
+    }
+    // optimizedFM(numServers, serverCapacities);
+}
+
+int main(int argc, char *argv[]) {
+    ifstream cin(argv[0]);
+    ofstream cout(argv[1]);
+    string line;
+    long long n, m;
+
+    cin >> maxDiskCapacity;
+    cin >> line;
+
+    if (line == ".agent") {
+        cin >> n;
+        for (long long i = 0; i < n; i++) {
+            Node node;
+            cin >> line;
+            node.weight = stoi(line);
+            node.id = i;
+            node.server = -1;
+            nodes.push_back(node);
+        }
+    } else {
+        cout << "Error: .agent not found" << endl;
+        return 0;
+    }
+    cin >> line;
+    if (line == ".team") {
+        cin >> n;
+        for (long long i = 0; i < n; i++) {
+            Edge edge;
+            edge.total_weight = 0;
+            edge.edge_cost = 0;
+            cin >> m;
+            for (long long j = 0; j < m; j++) {
+                cin >> line;
+                edge.members.push_back(stoi(line));
+                edge.total_weight += nodes[stoi(line)].weight;
+            }
+            edges.push_back(edge);
+        }
+    } else {
+        cout << "Error: .team not found" << endl;
+        return 0;
+    }
+
+
+    if (maxDiskCapacity < 500000) {
+        sort(edges.begin(), edges.end(), [](Edge &a, Edge &b) {
+            if (a.members.size() != b.members.size()) return a.members.size() > b.members.size();
+            return a.total_weight < b.total_weight;
+        });
+    }
+
+    build_graph(2);
+
+
+    // output
+    int numServers = 0;
+    for (int i = 0; i < assignments.size(); i++) {
+        if (assignments[i] > numServers) {
+            numServers = assignments[i];
+        }
+    }
+    cout << calculateCost() << endl;
+    cout << numServers + 1 << endl;
+
+    for (long long i = 0; i < assignments.size(); ++i) {
+        cout << assignments[i] << endl;
+    }
 
     return 0;
 }

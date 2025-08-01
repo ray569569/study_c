@@ -11,7 +11,7 @@ void printMatrix(const vector<vector<double>>& mat, const string& name) {
     cout << name << " Matrix:" << endl;
     for (const auto& row : mat) {
         for (double val : row) {
-            cout <<setw(10)<< val << "\t";
+            cout <<setw(10)<< val*4096*4096 << "\t";
         }
         cout << endl;
     }
@@ -76,6 +76,13 @@ int main() {
         { 0.0305,  0.8945,  0.4459, -0.0443},
         { 0.5231, -0.9562,  0.3862,  -0.6674}
     };
+    double t;
+    for(int i=0;i<N;i++){
+        for(int j=0;j<N;j++){
+            cin>>t;
+            A[i][j] = int(t);
+        }
+    }
 
     // 初始化 Q 和 R
     vector<vector<double>> Q(N, vector<double>(N, 0));
@@ -88,8 +95,22 @@ int main() {
     printMatrix(A, "Input");
     printMatrix(Q, "Q");
     printMatrix(R, "R");
+
     // 計算反矩陣
     vector<vector<double>> invA(N, vector<double>(N, 0));
+    vector<vector<double>> invR(N, vector<double>(N, 0));
+    for (int i = 0; i < N; i++) {
+        invR[i][i] = 1.0 / R[i][i];
+        for (int j = i - 1; j >= 0; j--) {
+            double sum = 0.0;
+            for (int k = j + 1; k <= i; k++) {
+                sum += R[j][k] * invR[k][i];
+            }
+            invR[j][i] = -sum / R[j][j];
+        }
+    }
+    printMatrix(invR, "Inverse of R");
+    
     for (int i = 0; i < N; i++) {
         vector<double> e(N, 0);
         e[i] = 1;
