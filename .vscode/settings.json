@@ -8,6 +8,9 @@
         "vector": "cpp",
         "xstring": "cpp",
         "xutility": "cpp",
+<<<<<<< HEAD
+        "ostream": "cpp"
+=======
         "ostream": "cpp",
         "bitset": "cpp",
         "string_view": "cpp",
@@ -94,5 +97,6 @@
         "typeinfo": "cpp",
         "valarray": "cpp",
         "variant": "cpp"
+>>>>>>> 0ac91debceb1f9b00ca64fa11916a9390db1a3c4
     }
 }
