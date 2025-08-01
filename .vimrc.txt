@@ -44,3 +44,4 @@ autocmd Filetype cpp nn <F9> :w <bar> :!clear &&
     \   g++ % -o %<.exe -std=c++17 -fsanitize=undefined -Wall -Wextra -Wshadow &&
     \   echo '>>>' && 
     \   ./%<.exe <CR>
+
